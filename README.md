@@ -39,29 +39,22 @@ android上开源弹幕解析绘制引擎项目。[![Build Status](https://travis
 
 
 ### Download
-Download the [latest version][1] or grab via Maven:
-
-```xml
-<dependency>
-  <groupId>com.github.ctiao</groupId>
-  <artifactId>dfm</artifactId>
-  <version>0.9.25</version>
-</dependency>
-```
-
-or Gradle:
+Download the [latest version][1] or grab via Gradle:
 ```groovy
 repositories {
-    jcenter()
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
-    compile 'com.github.ctiao:ndkbitmap-armv7a:0.9.21'
+    implementation 'com.github.Blue-Island-X.DanmakuFlameMaster:v0.9.26'
+    implementation 'com.github.Blue-Island-X.DanmakuFlameMaster:ndkbitmap-armv7a:v0.9.26'
 
     # Other ABIs: optional
-    compile 'com.github.ctiao:ndkbitmap-armv5:0.9.21'
-    compile 'com.github.ctiao:ndkbitmap-x86:0.9.21'
+    implementation 'com.github.Blue-Island-X.DanmakuFlameMaster:ndkbitmap-arm64:v0.9.26'
+    implementation 'com.github.Blue-Island-X.DanmakuFlameMaster:ndkbitmap-x86:v0.9.26'
+    implementation 'com.github.Blue-Island-X.DanmakuFlameMaster:ndkbitmap-x86_64:v0.9.26'
 }
 ```
 Snapshots of the development version are available in [Sonatype's snapshots repository][2].
