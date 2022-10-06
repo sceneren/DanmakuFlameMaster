@@ -20,7 +20,6 @@ def SourcePath = 'src/main/'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 9
@@ -41,10 +40,4 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-}
-if (rootProject.file('gradle/gradle-mvn-push.gradle').exists()) {
-    apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-}
-if (rootProject.file('gradle/gradle-bintray-upload.gradle').exists()) {
-    apply from: rootProject.file('gradle/gradle-bintray-upload.gradle')
 }
