@@ -16,8 +16,6 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import android.util.Log;
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.FBDanmaku;

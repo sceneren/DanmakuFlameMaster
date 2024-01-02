@@ -2,6 +2,7 @@ package master.flame.danmaku.danmaku.model.android;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.StaticLayout;
@@ -20,13 +21,20 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
         if (danmaku.text instanceof Spanned) {
             CharSequence text = danmaku.text;
-            if (text != null) {
-                StaticLayout staticLayout = new StaticLayout(text, paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
-                danmaku.paintWidth = staticLayout.getWidth();
-                danmaku.paintHeight = staticLayout.getHeight();
-                danmaku.obj = new SoftReference<>(staticLayout);
-                return;
+            StaticLayout staticLayout;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                staticLayout = StaticLayout.Builder.obtain(text, 0, text.length(), paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)))
+                        .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                        .setLineSpacing(0f, 1f)
+                        .setIncludePad(true)
+                        .build();
+            } else {
+                staticLayout = new StaticLayout(text, paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
             }
+            danmaku.paintWidth = staticLayout.getWidth();
+            danmaku.paintHeight = staticLayout.getHeight();
+            danmaku.obj = new SoftReference<>(staticLayout);
+            return;
         }
         super.measure(danmaku, paint, fromWorkerThread);
     }

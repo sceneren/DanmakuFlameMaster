@@ -131,7 +131,7 @@ public class DanmakuRenderer extends Renderer {
     private final DanmakusRetainer mDanmakusRetainer;
     private ICacheManager mCacheManager;
     private OnDanmakuShownListener mOnDanmakuShownListener;
-    private Consumer mConsumer = new Consumer();
+    private final Consumer mConsumer = new Consumer();
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;

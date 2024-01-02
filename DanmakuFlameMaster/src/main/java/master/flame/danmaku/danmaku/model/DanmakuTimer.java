@@ -16,7 +16,7 @@
 
 package master.flame.danmaku.danmaku.model;
 
-public class DanmakuTimer {
+public final class DanmakuTimer {
     public long currMillisecond;
 
     private long lastInterval;

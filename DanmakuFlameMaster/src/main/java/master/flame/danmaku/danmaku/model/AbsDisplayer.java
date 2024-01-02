@@ -1,11 +1,14 @@
 package master.flame.danmaku.danmaku.model;
 
+import android.graphics.Canvas;
+import android.graphics.Typeface;
+
 import master.flame.danmaku.danmaku.model.android.BaseCacheStuffer;
 
-public abstract class AbsDisplayer<T, F> implements IDisplayer {
-    
+public abstract class AbsDisplayer<T extends Canvas, F> implements IDisplayer {
+
     public abstract T getExtraData();
-    
+
     public abstract void setExtraData(T data);
 
     @Override

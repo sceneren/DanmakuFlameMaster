@@ -112,7 +112,7 @@ public class DrawHandler extends Handler {
 
     private static final int MAX_RECORD_SIZE = 500;
 
-    private LinkedList<Long> mDrawTimes = new LinkedList<>();
+    private final LinkedList<Long> mDrawTimes = new LinkedList<>();
 
     private UpdateThread mThread;
 
@@ -250,7 +250,9 @@ public class DrawHandler extends Handler {
                     long deltaMs = position - timer.currMillisecond;
                     mTimeBase -= deltaMs;
                     timer.update(position);
-                    mContext.mGlobalFlagValues.updateMeasureFlag();
+                    if (mContext != null) {
+                        mContext.mGlobalFlagValues.updateMeasureFlag();
+                    }
                     if (drawTask != null)
                         drawTask.seek(position);
                     pausedPosition = position;
@@ -265,7 +267,9 @@ public class DrawHandler extends Handler {
                     timer.update(pausedPosition);
                     removeMessages(RESUME);
                     sendEmptyMessage(UPDATE);
-                    drawTask.start();
+                    if (drawTask != null) {
+                        drawTask.start();
+                    }
                     notifyRendering();
                     mInSeekingAction = false;
                     if (drawTask != null) {
@@ -276,6 +280,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case UPDATE:
+                if (mContext == null) break;
                 if (mContext.updateMethod == 0) {
                     updateInChoreographer();
                 } else if (mContext.updateMethod == 1) {
@@ -285,6 +290,7 @@ public class DrawHandler extends Handler {
                 }
                 break;
             case NOTIFY_DISP_SIZE_CHANGED:
+                if (mContext == null) break;
                 mContext.mDanmakuFactory.notifyDispSizeChanged(mContext);
                 Boolean updateFlag = (Boolean) msg.obj;
                 if (updateFlag != null && updateFlag) {
@@ -555,8 +561,10 @@ public class DrawHandler extends Handler {
         long averageFrameConsumingTime = 16;
         mCordonTime = Math.max(33, (long) (averageFrameConsumingTime * 2.5f));
         mCordonTime2 = (long) (mCordonTime * 2.5f);
-        mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
+//        mFrameUpdateRate = Math.max(16, averageFrameConsumingTime / 15 * 15);
+        mFrameUpdateRate = getConfig().getFrameUpdateRate();
         mThresholdTime = mFrameUpdateRate + 3;
+
 //        Log.i("DrawHandler", "initRenderingConfigs test-fps:" + averageFrameConsumingTime + "ms,mCordonTime:"
 //                + mCordonTime + ",mFrameRefreshingRate:" + mFrameUpdateRate);
     }

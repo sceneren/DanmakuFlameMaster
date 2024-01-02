@@ -4,7 +4,7 @@ package master.flame.danmaku.danmaku.loader;
  * @author yrom
  *
  */
-public class IllegalDataException extends Exception {
+public final class IllegalDataException extends Exception {
 	
 	private static final long serialVersionUID = 10441759254L;
 

@@ -44,7 +44,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
     }
 
-    private class Point {
+    private static class Point {
         float x, y;
 
         public Point(float x, float y) {
@@ -59,7 +59,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
     }
 
-    public class LinePath {
+    public static class LinePath {
         Point pBegin, pEnd;
         public long duration, beginTime, endTime;
         float delatX, deltaY;
@@ -124,7 +124,7 @@ public class SpecialDanmaku extends BaseDanmaku {
 
     public float pivotX, pivotY;
 
-    private float[] currStateValues = new float[4];
+    private final float[] currStateValues = new float[4];
 
     public LinePath[] linePaths;
 
@@ -241,7 +241,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         return currStateValues;
     }
 
-    private final static float getQuadEaseOutProgress(long ctime, long duration) {
+    private static float getQuadEaseOutProgress(long ctime, long duration) {
 //            Math.easeOutQuad = function (t, b, c, d) {
 //                t /= d;
 //                return -c * t*(t-2) + b;

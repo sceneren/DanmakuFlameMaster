@@ -26,7 +26,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class FakeDanmakuView extends DanmakuView implements DrawHandler.Callback {
 
-    private class CustomParser extends BaseDanmakuParser {
+    private static class CustomParser extends BaseDanmakuParser {
         private final BaseDanmakuParser mBaseParser;
         private final long stTime;
         private final long edTime;

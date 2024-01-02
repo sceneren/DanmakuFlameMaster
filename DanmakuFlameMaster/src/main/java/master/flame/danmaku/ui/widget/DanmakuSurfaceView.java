@@ -42,11 +42,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.SystemClock;
 
-import static android.R.attr.x;
-
 public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDanmakuViewController, SurfaceHolder.Callback {
-
-    public static final String TAG = "DanmakuSurfaceView";
 
     private Callback mCallback;
 
@@ -283,8 +279,8 @@ public class DanmakuSurfaceView extends SurfaceView implements IDanmakuView, IDa
                 RenderingState rs = handler.draw(canvas);
                 if (mShowFps) {
                     if (mDrawTimes == null)
-                        mDrawTimes = new LinkedList<Long>();
-                    dtime = SystemClock.uptimeMillis() - stime;
+                        mDrawTimes = new LinkedList<>();
+//                    dtime = SystemClock.uptimeMillis() - stime;
                     String fps = String.format(Locale.getDefault(),
                             "fps %.2f,time:%d s,cache:%d,miss:%d", fps(), getCurrentTime() / 1000,
                             rs.cacheHitCount, rs.cacheMissCount);

@@ -19,7 +19,7 @@ public class CachingPolicy {
     public final static int CACHE_PERIOD_NOT_RECYCLE = -1;
 
     public final static CachingPolicy POLICY_LAZY = new CachingPolicy(BMP_BPP_ARGB_4444, 0.3f, CACHE_PERIOD_AUTO, 50, 0.01f);
-    public final static CachingPolicy POLICY_GREEDY = new CachingPolicy(BMP_BPP_ARGB_4444, 0.5f, CACHE_PERIOD_NOT_RECYCLE, 50, 0.005f);
+//    public final static CachingPolicy POLICY_GREEDY = new CachingPolicy(BMP_BPP_ARGB_4444, 0.5f, CACHE_PERIOD_NOT_RECYCLE, 50, 0.005f);
     public final static CachingPolicy POLICY_DEFAULT = POLICY_LAZY;
 
 

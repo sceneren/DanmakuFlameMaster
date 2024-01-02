@@ -24,8 +24,6 @@ public class DrawingCacheHolder {
 
     public int height;
 
-    public boolean drawn;
-
     private int mDensity;
 
     public DrawingCacheHolder() {
@@ -69,6 +67,7 @@ public class DrawingCacheHolder {
     }
 
     public synchronized void recycle() {
+        canvas = null;
         Bitmap bitmapReserve = bitmap;
         bitmap = null;
         width = height = 0;
@@ -129,9 +128,9 @@ public class DrawingCacheHolder {
 
     private void eraseBitmapArray() {
         if (bitmapArray != null) {
-            for (int i = 0; i < bitmapArray.length; i++) {
-                for (int j = 0; j < bitmapArray[i].length; j++) {
-                    eraseBitmap(bitmapArray[i][j]);
+            for (Bitmap[] bitmaps : bitmapArray) {
+                for (Bitmap value : bitmaps) {
+                    eraseBitmap(value);
                 }
             }
         }

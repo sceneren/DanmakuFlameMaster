@@ -109,9 +109,25 @@ public abstract class BaseDanmaku {
     public int borderColor = 0;
 
     /**
+     * 边框厚度
+     */
+    public float borderWidth = 4f;
+
+    /**
+     * 边框圆角弧度
+     */
+    public float borderRound = 0;
+
+    /**
      * 内边距(像素)
      */
-    public int padding = 0;
+    public int paddingLeft = 0;
+
+    public int paddingRight = 0;
+
+    public int paddingTop = 0;
+
+    public int paddingBottom = 0;
 
     /**
      * 弹幕优先级,0为低优先级,>0为高优先级不会被过滤器过滤
@@ -216,7 +232,7 @@ public abstract class BaseDanmaku {
      */
     public int firstShownFlag = -1;
 
-    private SparseArray<Object> mTags = new SparseArray<>();
+    private final SparseArray<Object> mTags = new SparseArray<>();
 
     public long getDuration() {
         return duration.value;
@@ -224,6 +240,20 @@ public abstract class BaseDanmaku {
 
     public void setDuration(Duration duration) {
         this.duration = duration;
+    }
+
+    /**
+     * 设置内边距，单位px
+     */
+    public void setPadding(int left, int top, int right, int bottom) {
+        this.paddingLeft = left;
+        this.paddingTop = top;
+        this.paddingRight = right;
+        this.paddingBottom = bottom;
+    }
+
+    public void setPadding(int i) {
+        this.paddingLeft = this.paddingTop = this.paddingRight = this.paddingBottom = i;
     }
 
     public int draw(IDisplayer displayer) {
@@ -344,9 +374,6 @@ public abstract class BaseDanmaku {
     }
 
     public Object getTag(int key) {
-        if (mTags == null) {
-            return null;
-        }
         return mTags.get(key);
     }
 

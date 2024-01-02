@@ -31,7 +31,6 @@ public class Danmaku extends BaseDanmaku {
 
     @Override
     public void layout(IDisplayer displayer, float x, float y) {
-
     }
 
     @Override

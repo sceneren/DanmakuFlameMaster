@@ -1,6 +1,7 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import android.graphics.Canvas;
 import android.graphics.Typeface;
 
 import java.lang.ref.WeakReference;
@@ -18,6 +19,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class DanmakuContext implements Cloneable {
 
     public static DanmakuContext create() {
@@ -61,8 +63,8 @@ public class DanmakuContext implements Cloneable {
     public boolean R2LDanmakuVisibility = true;
 
     public boolean SpecialDanmakuVisibility = true;
-    
-    List<Integer> mFilterTypes = new ArrayList<Integer>();
+
+    List<Integer> mFilterTypes = new ArrayList<>();
 
     /**
      * 同屏弹幕数量 -1 按绘制效率自动调整 0 无限制 n 同屏最大显示n个弹幕
@@ -74,13 +76,15 @@ public class DanmakuContext implements Cloneable {
      */
     public float scrollSpeedFactor = 1.0f;
 
+    private int mUpdateRate = 16;
+
     public AbsDanmakuSync danmakuSync;
 
-    List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
-    
-    List<Integer> mUserIdBlackList = new ArrayList<Integer>(); 
-    
-    List<String> mUserHashBlackList = new ArrayList<String>();
+    List<Integer> mColorValueWhiteList = new ArrayList<>();
+
+    List<Integer> mUserIdBlackList = new ArrayList<>();
+
+    List<String> mUserHashBlackList = new ArrayList<>();
 
     private List<WeakReference<ConfigChangedCallback>> mCallbackList;
 
@@ -96,7 +100,7 @@ public class DanmakuContext implements Cloneable {
 
     private boolean mIsPreventOverlappingEnabled;
 
-    public AbsDisplayer mDisplayer = new AndroidDisplayer();
+    public AbsDisplayer<Canvas,Typeface> mDisplayer = new AndroidDisplayer();
 
     public GlobalFlagValues mGlobalFlagValues = new GlobalFlagValues();
 
@@ -116,7 +120,7 @@ public class DanmakuContext implements Cloneable {
         this.mBaseComparator = baseComparator;
     }
 
-    public AbsDisplayer getDisplayer() {
+    public AbsDisplayer<Canvas,Typeface> getDisplayer() {
         return mDisplayer;
     }
 
@@ -124,14 +128,34 @@ public class DanmakuContext implements Cloneable {
      * 0 默认 Choreographer驱动DrawHandler线程刷新 <br />
      * 1 "DFM Update"单独线程刷新 <br />
      * 2 DrawHandler线程自驱动刷新
-     *
+     * <p>
      * Note: 在系统{@link android.os.Build.VERSION_CODES#JELLY_BEAN}以下, 0方式会被2方式代替
      */
     public byte updateMethod = 0;
 
+    public int getFrameUpdateRate() {
+        return mUpdateRate;
+    }
+
+    /**
+     * 设置屏幕刷新率
+     *
+     * @param rate
+     */
+    public DanmakuContext setFrameUpdateRate(int rate) {
+        mUpdateRate = rate;
+        return this;
+    }
+
+    public DanmakuContext setRefreshRate(float refreshRate) {
+        mUpdateRate = (int) (1000 / refreshRate);
+        return this;
+    }
+
+
     /**
      * set typeface
-     * 
+     *
      * @param font
      */
     public DanmakuContext setTypeface(Typeface font) {
@@ -191,7 +215,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否显示顶部弹幕
-     * 
+     *
      * @param visible
      */
     public DanmakuContext setFTDanmakuVisibility(boolean visible) {
@@ -218,7 +242,7 @@ public class DanmakuContext implements Cloneable {
     private void setDanmakuVisible(boolean visible, int type) {
         if (visible) {
             mFilterTypes.remove(Integer.valueOf(type));
-        } else if (!mFilterTypes.contains(Integer.valueOf(type))) {
+        } else if (!mFilterTypes.contains(type)) {
             mFilterTypes.add(type);
         }
     }
@@ -232,7 +256,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否显示底部弹幕
-     * 
+     *
      * @param visible
      */
     public DanmakuContext setFBDanmakuVisibility(boolean visible) {
@@ -255,14 +279,14 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否显示左右滚动弹幕
-     * 
+     *
      * @param visible
      */
     public DanmakuContext setL2RDanmakuVisibility(boolean visible) {
         setDanmakuVisible(visible, BaseDanmaku.TYPE_SCROLL_LR);
         setFilterData(DanmakuFilters.TAG_TYPE_DANMAKU_FILTER, mFilterTypes);
         mGlobalFlagValues.updateFilterFlag();
-        if(L2RDanmakuVisibility != visible){
+        if (L2RDanmakuVisibility != visible) {
             L2RDanmakuVisibility = visible;
             notifyConfigureChanged(DanmakuConfigTag.L2R_DANMAKU_VISIBILITY, visible);
         }
@@ -278,7 +302,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否显示右左滚动弹幕
-     * 
+     *
      * @param visible
      */
     public DanmakuContext setR2LDanmakuVisibility(boolean visible) {
@@ -301,7 +325,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否显示特殊弹幕
-     * 
+     *
      * @param visible
      */
     public DanmakuContext setSpecialDanmakuVisibility(boolean visible) {
@@ -317,7 +341,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置同屏弹幕密度 -1自动 0无限制
-     * 
+     *
      * @param maxSize
      * @return
      */
@@ -345,16 +369,15 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置描边样式
-     * 
-     * @param style DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
-     *            DANMAKU_STYLE_STROKEN or DANMAKU_STYLE_PROJECTION
-     * @param values
-     *        DANMAKU_STYLE_SHADOW 阴影模式下，values传入阴影半径
-     *        DANMAKU_STYLE_STROKEN 描边模式下，values传入描边宽度
-     *        DANMAKU_STYLE_PROJECTION
-     *            投影模式下，values传入offsetX, offsetY, alpha
-     *                offsetX/offsetY: x/y 方向上的偏移量
-     *                alpha: 投影透明度 [0...255]
+     *
+     * @param style  DANMAKU_STYLE_NONE DANMAKU_STYLE_SHADOW or
+     *               DANMAKU_STYLE_STROKEN or DANMAKU_STYLE_PROJECTION
+     * @param values DANMAKU_STYLE_SHADOW 阴影模式下，values传入阴影半径
+     *               DANMAKU_STYLE_STROKEN 描边模式下，values传入描边宽度
+     *               DANMAKU_STYLE_PROJECTION
+     *               投影模式下，values传入offsetX, offsetY, alpha
+     *               offsetX/offsetY: x/y 方向上的偏移量
+     *               alpha: 投影透明度 [0...255]
      * @return
      */
     public DanmakuContext setDanmakuStyle(int style, float... values) {
@@ -365,7 +388,7 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置是否粗体显示,对某些字体无效
-     * 
+     *
      * @param bold
      * @return
      */
@@ -374,9 +397,10 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.DANMAKU_BOLD, bold);
         return this;
     }
-    
+
     /**
      * 设置色彩过滤弹幕白名单
+     *
      * @param colors
      * @return
      */
@@ -392,14 +416,15 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.COLOR_VALUE_WHITE_LIST, mColorValueWhiteList);
         return this;
     }
-    
-    public List<Integer> getColorValueWhiteList(){
+
+    public List<Integer> getColorValueWhiteList() {
         return mColorValueWhiteList;
     }
-    
+
     /**
      * 设置屏蔽弹幕用户hash
-     * @param hashes 
+     *
+     * @param hashes
      * @return
      */
     public DanmakuContext setUserHashBlackList(String... hashes) {
@@ -414,9 +439,9 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
-    
-    public DanmakuContext removeUserHashBlackList(String... hashes){
-        if(hashes == null || hashes.length == 0) {
+
+    public DanmakuContext removeUserHashBlackList(String... hashes) {
+        if (hashes == null || hashes.length == 0) {
             return this;
         }
         for (String hash : hashes) {
@@ -427,14 +452,15 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
-    
+
     /**
      * 添加屏蔽用户
+     *
      * @param hashes
      * @return
      */
-    public DanmakuContext addUserHashBlackList(String... hashes){
-        if(hashes == null || hashes.length == 0) {
+    public DanmakuContext addUserHashBlackList(String... hashes) {
+        if (hashes == null || hashes.length == 0) {
             return this;
         }
         Collections.addAll(mUserHashBlackList, hashes);
@@ -443,15 +469,16 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
         return this;
     }
-    
-    public List<String> getUserHashBlackList(){
+
+    public List<String> getUserHashBlackList() {
         return mUserHashBlackList;
     }
-    
-    
+
+
     /**
      * 设置屏蔽弹幕用户id , 0 表示游客弹幕
-     * @param ids 
+     *
+     * @param ids
      * @return
      */
     public DanmakuContext setUserIdBlackList(Integer... ids) {
@@ -466,9 +493,9 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
-    
-    public DanmakuContext removeUserIdBlackList(Integer... ids){
-        if(ids == null || ids.length == 0) {
+
+    public DanmakuContext removeUserIdBlackList(Integer... ids) {
+        if (ids == null || ids.length == 0) {
             return this;
         }
         for (Integer id : ids) {
@@ -479,14 +506,15 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
-    
+
     /**
      * 添加屏蔽用户
+     *
      * @param ids
      * @return
      */
-    public DanmakuContext addUserIdBlackList(Integer... ids){
-        if(ids == null || ids.length == 0) {
+    public DanmakuContext addUserIdBlackList(Integer... ids) {
+        if (ids == null || ids.length == 0) {
             return this;
         }
         Collections.addAll(mUserIdBlackList, ids);
@@ -495,13 +523,14 @@ public class DanmakuContext implements Cloneable {
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
         return this;
     }
-    
-    public List<Integer> getUserIdBlackList(){
+
+    public List<Integer> getUserIdBlackList() {
         return mUserIdBlackList;
     }
-    
+
     /**
      * 设置是否屏蔽游客弹幕
+     *
      * @param block true屏蔽，false不屏蔽
      * @return
      */
@@ -518,13 +547,14 @@ public class DanmakuContext implements Cloneable {
         }
         return this;
     }
-    
+
     /**
      * 设置弹幕滚动速度系数,只对滚动弹幕有效
+     *
      * @param p
      * @return
      */
-    public DanmakuContext setScrollSpeedFactor(float p){
+    public DanmakuContext setScrollSpeedFactor(float p) {
         if (scrollSpeedFactor != p) {
             scrollSpeedFactor = p;
             mDanmakuFactory.updateDurationFactor(p);
@@ -534,9 +564,10 @@ public class DanmakuContext implements Cloneable {
         }
         return this;
     }
-    
+
     /**
      * 设置是否启用合并重复弹幕
+     *
      * @param enable
      * @return
      */
@@ -568,9 +599,10 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置最大显示行数
+     *
      * @param pairs map<K,V> 设置null取消行数限制
-     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
-     * V = 最大行数
+     *              K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     *              V = 最大行数
      * @return
      */
     public DanmakuContext setMaximumLines(Map<Integer, Integer> pairs) {
@@ -592,9 +624,10 @@ public class DanmakuContext implements Cloneable {
 
     /**
      * 设置防弹幕重叠
+     *
      * @param pairs map<K,V> 设置null恢复默认设置,默认为允许重叠
-     * K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
-     * V = true|false 是否重叠
+     *              K = (BaseDanmaku.TYPE_SCROLL_RL|BaseDanmaku.TYPE_SCROLL_LR|BaseDanmaku.TYPE_FIX_TOP|BaseDanmaku.TYPE_FIX_BOTTOM)
+     *              V = true|false 是否重叠
      * @return
      */
     public DanmakuContext preventOverlapping(Map<Integer, Boolean> pairs) {
@@ -620,6 +653,7 @@ public class DanmakuContext implements Cloneable {
     /**
      * 设置缓存绘制填充器，默认使用{@link SimpleTextCacheStuffer}只支持纯文字显示, 如果需要图文混排请设置{@link SpannedCacheStuffer}
      * 如果需要定制其他样式请扩展{@link SimpleTextCacheStuffer}|{@link SpannedCacheStuffer}
+     *
      * @param cacheStuffer
      * @param cacheStufferAdapter
      */
@@ -641,22 +675,22 @@ public class DanmakuContext implements Cloneable {
         this.cachingPolicy = cachingPolicy;
         return this;
     }
-    
+
     public interface ConfigChangedCallback {
         public boolean onDanmakuConfigChanged(DanmakuContext config, DanmakuConfigTag tag,
-                Object... value);
+                                              Object... value);
     }
 
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
         if (listener == null || mCallbackList == null) {
-            mCallbackList = Collections.synchronizedList(new ArrayList<WeakReference<ConfigChangedCallback>>());
+            mCallbackList = Collections.synchronizedList(new ArrayList());
         }
         for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
             if (listener.equals(configReferer.get())) {
                 return;
             }
         }
-        mCallbackList.add(new WeakReference<ConfigChangedCallback>(listener));
+        mCallbackList.add(new WeakReference<>(listener));
     }
 
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
@@ -664,7 +698,7 @@ public class DanmakuContext implements Cloneable {
             return;
         for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
             if (listener.equals(configReferer.get())) {
-                mCallbackList.remove(listener);
+                mCallbackList.remove(configReferer);
                 return;
             }
         }
@@ -688,13 +722,13 @@ public class DanmakuContext implements Cloneable {
         }
     }
 
-    public DanmakuContext registerFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+    public DanmakuContext registerFilter(DanmakuFilters.BaseDanmakuFilter<?> filter) {
         mDanmakuFilters.registerFilter(filter);
         mGlobalFlagValues.updateFilterFlag();
         return this;
     }
 
-    public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+    public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter<?> filter) {
         mDanmakuFilters.unregisterFilter(filter);
         mGlobalFlagValues.updateFilterFlag();
         return this;

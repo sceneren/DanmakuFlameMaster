@@ -135,7 +135,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         @Override
         public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-            danmaku.padding = 10;  // 在背景绘制模式下增加padding
+            danmaku.paddingBottom = 10;  // 在背景绘制模式下增加padding
+            danmaku.paddingTop = 10;  // 在背景绘制模式下增加padding
+            danmaku.paddingLeft = 30;  // 在背景绘制模式下增加padding
+            danmaku.paddingRight = 30;  // 在背景绘制模式下增加padding
+
             super.measure(danmaku, paint, fromWorkerThread);
         }
 
@@ -388,7 +392,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // for(int i=0;i<100;i++){
         // }
         danmaku.text = "这是一条弹幕" + System.nanoTime();
-        danmaku.padding = 5;
+        danmaku.setPadding(5);
         danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.isLive = islive;
         danmaku.setTime(mDanmakuView.getCurrentTime() + 1200);
@@ -407,7 +411,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         drawable.setBounds(0, 0, 100, 100);
         SpannableStringBuilder spannable = createSpannable(drawable);
         danmaku.text = spannable;
-        danmaku.padding = 5;
+        danmaku.setPadding(5);
         danmaku.priority = 1;  // 一定会显示, 一般用于本机发送的弹幕
         danmaku.isLive = islive;
         danmaku.setTime(mDanmakuView.getCurrentTime() + 1200);

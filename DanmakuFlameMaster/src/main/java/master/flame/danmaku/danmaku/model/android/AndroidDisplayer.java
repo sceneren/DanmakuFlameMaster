@@ -23,7 +23,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.TextPaint;
 
 import java.util.HashMap;
@@ -42,21 +41,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
         public final TextPaint PAINT, PAINT_DUPLICATE;
 
-        private Paint ALPHA_PAINT;
+        private final Paint ALPHA_PAINT;
 
-        private Paint UNDERLINE_PAINT;
+        private final Paint UNDERLINE_PAINT;
 
-        private Paint BORDER_PAINT;
+        private final Paint BORDER_PAINT;
 
         /**
          * 下划线高度
          */
         public int UNDERLINE_HEIGHT = 4;
-
-        /**
-         * 边框厚度
-         */
-        public static final int BORDER_WIDTH = 4;
 
         /**
          * 阴影半径
@@ -113,9 +107,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             UNDERLINE_PAINT = new Paint();
             UNDERLINE_PAINT.setStrokeWidth(UNDERLINE_HEIGHT);
             UNDERLINE_PAINT.setStyle(Style.STROKE);
+
             BORDER_PAINT = new Paint();
             BORDER_PAINT.setStyle(Style.STROKE);
-            BORDER_PAINT.setStrokeWidth(BORDER_WIDTH);
         }
 
         public void setTypeface(Typeface typeface) {
@@ -133,9 +127,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
         public void setProjectionConfig(float offsetX, float offsetY, int alpha) {
             if (sProjectionOffsetX != offsetX || sProjectionOffsetY != offsetY || sProjectionAlpha != alpha) {
-                sProjectionOffsetX = (offsetX > 1.0f) ? offsetX : 1.0f;
-                sProjectionOffsetY = (offsetY > 1.0f) ? offsetY : 1.0f;
-                sProjectionAlpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : alpha);
+                sProjectionOffsetX = Math.max(offsetX, 1.0f);
+                sProjectionOffsetY = Math.max(offsetY, 1.0f);
+                sProjectionAlpha = (alpha < 0) ? 0 : (Math.min(alpha, 255));
             }
         }
 
@@ -172,6 +166,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
         public Paint getBorderPaint(BaseDanmaku danmaku) {
             BORDER_PAINT.setColor(danmaku.borderColor);
+            BORDER_PAINT.setStrokeWidth(danmaku.borderWidth);
             return BORDER_PAINT;
         }
 
@@ -259,9 +254,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         }
     }
 
-    private Camera camera = new Camera();
+    private final Camera camera = new Camera();
 
-    private Matrix matrix = new Matrix();
+    private final Matrix matrix = new Matrix();
 
     private final DisplayerConfig mDisplayConfig = new DisplayerConfig();
 
@@ -272,21 +267,13 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     }
 
     @SuppressLint("NewApi")
-    private static final int getMaximumBitmapWidth(Canvas c) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            return c.getMaximumBitmapWidth();
-        } else {
-            return c.getWidth();
-        }
+    private static int getMaximumBitmapWidth(Canvas c) {
+        return c.getMaximumBitmapWidth();
     }
 
     @SuppressLint("NewApi")
-    private static final int getMaximumBitmapHeight(Canvas c) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            return c.getMaximumBitmapHeight();
-        } else {
-            return c.getHeight();
-        }
+    private static int getMaximumBitmapHeight(Canvas c) {
+        return c.getMaximumBitmapHeight();
     }
 
     public void setTypeFace(Typeface font) {
@@ -477,7 +464,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
         camera.save();
-        if (locationZ !=0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+        if (locationZ != 0) {
             camera.setLocation(0, 0, locationZ);
         }
         camera.rotateY(-danmaku.rotationY);
@@ -528,11 +515,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     }
 
     private void setDanmakuPaintWidthAndHeight(BaseDanmaku danmaku, float w, float h) {
-        float pw = w + 2 * danmaku.padding;
-        float ph = h + 2 * danmaku.padding;
+        float pw = w + danmaku.paddingLeft + danmaku.paddingRight;
+        float ph = h + danmaku.paddingTop + danmaku.paddingBottom;
         if (danmaku.borderColor != 0) {
-            pw += 2 * mDisplayConfig.BORDER_WIDTH;
-            ph += 2 * mDisplayConfig.BORDER_WIDTH;
+            pw += 2 * danmaku.borderWidth;
+            ph += 2 * danmaku.borderWidth;
         }
         danmaku.paintWidth = pw + getStrokeWidth();
         danmaku.paintHeight = ph;

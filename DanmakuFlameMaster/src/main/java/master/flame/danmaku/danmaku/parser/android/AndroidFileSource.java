@@ -68,8 +68,6 @@ public class AndroidFileSource implements IDataSource<InputStream> {
             url.openConnection();
             inStream = new BufferedInputStream(url.openStream());
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

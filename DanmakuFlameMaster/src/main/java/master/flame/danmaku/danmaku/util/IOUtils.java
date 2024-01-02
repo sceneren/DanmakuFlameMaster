@@ -18,7 +18,7 @@ public class IOUtils {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[8192];
-            int len = 0;
+            int len;
             while ((len = in.read(buffer)) != -1)
                 baos.write(buffer, 0, len);
             in.close();

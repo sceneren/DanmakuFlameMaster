@@ -1,8 +1,6 @@
 package master.flame.danmaku.ui.widget;
 
 import android.graphics.RectF;
-import android.nfc.Tag;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,12 +15,12 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
  */
 public class DanmakuTouchHelper {
     private final GestureDetector mTouchDelegate;
-    private IDanmakuView danmakuView;
-    private RectF mDanmakuBounds;
+    private final IDanmakuView danmakuView;
+    private final RectF mDanmakuBounds;
     private float mXOff;
     private float mYOff;
 
-    private final android.view.GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
+    private final GestureDetector.OnGestureListener mOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDown(MotionEvent event) {
             if (danmakuView != null) {
